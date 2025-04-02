@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: &app-name go-card-cm
+  namespace: test-a
+  labels:
+    app: *app-name
+data:
+  API_VERSION: "3.0"
+  POD_NAME: "go-card.k8"
+  PORT: "6001"
+  DB_HOST: "rds-proxy-db-arch-02.proxy-cj4aqa08ettf.us-east-2.rds.amazonaws.com"
+  DB_PORT: "5432"
+  DB_NAME: "postgres"
+  DB_SCHEMA: "public"
+  DB_DRIVER: "postgres"
+  SETPOD_AZ: "false"
+  ENV: "dev"  
+  OTEL_EXPORTER_OTLP_ENDPOINT: "arch-eks-02-xray-collector.default.svc.cluster.local:4317"
