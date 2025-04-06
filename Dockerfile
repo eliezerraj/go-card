@@ -1,4 +1,4 @@
-#docker build -t go-oauth .
+#docker build -t go-card .
 #docker run -dit --name go-card -p 6100:6100 go-card sleep infinity
 
 FROM golang:1.23.3 As builder

@@ -26,17 +26,17 @@ Parameters:
       "authLatency": "$context.authorizer.latency"}'
   ApiPrivateName:
     Type: String
-    Default: go-onboarding-pv
+    Default: go-card-pv
   VPCEndpointId:
     Type: String
     Default: vpce-0cc0b1181b93539f0
   ApiPublicLogGroupName:
     Type: String
     Description: Name of API Gateway Log Group
-    Default: /dock/apigateway/go-onboarding-pv
+    Default: /dock/apigateway/go-card-pv
   ApiGatewayDomainName:
     Type: String
-    Default: go-onboarding.architecturedev.caradhras.io
+    Default: go-card.architecturedev.caradhras.io
   WafaclArn:
     Type: String
     Description: Association WAF in API ApiGateway
@@ -44,20 +44,20 @@ Parameters:
   EksDomainName:
     Type: String
     Description: EKS Domain name defined in ingress.yaml
-    Default: go-onboarding.architecturedev.caradhras.io
+    Default: go-card.architecturedev.caradhras.io
   EksVpcLinkId:
     Type: String
     Description: EKS VPC LinkID
     Default: mfyvth  
   Application:
     Type: String
-    Default: go-onboarding
+    Default: go-card
   Owner:
     Type: String
     Default: architecture
   Service:
     Type: String
-    Default: go-onboarding
+    Default: go-card
   Squad:
     Type: String
     Default: architecture
@@ -125,10 +125,10 @@ Resources:
       DefinitionBody:
         swagger: '2.0'
         info:
-          title: go-onboarding-pv
+          title: go-card-pv
         tags:
-        - name: go-onboarding-pv
-          description: go-onboarding-pv
+        - name: go-card-pv
+          description: go-card-pv
         schemes:
         - https
         paths:

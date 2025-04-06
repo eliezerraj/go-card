@@ -55,14 +55,18 @@ func (h HttpServer) StartHttpAppServer(	ctx context.Context,
 	tp := tracerProvider.NewTracerProvider(	ctx, 
 											appServer.ConfigOTEL, 
 											&infoTrace)
-
-	otel.SetTextMapPropagator(xray.Propagator{})
-	otel.SetTracerProvider(tp)
+	
+	if tp != nil {
+		otel.SetTextMapPropagator(xray.Propagator{})
+		otel.SetTracerProvider(tp)
+	}
 
 	defer func() { 
-		err := tp.Shutdown(ctx)
-		if err != nil{
-			childLogger.Error().Err(err).Send()
+		if tp != nil {
+			err := tp.Shutdown(ctx)
+			if err != nil{
+				childLogger.Error().Err(err).Send()
+			}
 		}
 		childLogger.Info().Msg("stop done !!!")
 	}()

@@ -22,10 +22,10 @@ spec:
       - name: volume-secret
         secret:
           secretName: es-rds-arch-secret-go-card
-      #securityContext:
-      #  runAsUser: 1000
-      #  runAsGroup: 2000
-      #  fsGroup: 3000
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 2000
+        fsGroup: 3000
       containers:
       - name: *app-name
         image: 992382474575.dkr.ecr.us-east-2.amazonaws.com/go-card:latest
@@ -54,7 +54,7 @@ spec:
             - ALL
         ports:
         - name: http
-          containerPort: 6000
+          containerPort: 6001
           protocol: TCP
         readinessProbe:
             httpGet:
