@@ -36,7 +36,7 @@ func (w WorkerRepository) AddCard(ctx context.Context, tx pgx.Tx, card model.Car
 	childLogger.Info().Str("func","AddCard").Interface("trace-resquest-id", ctx.Value("trace-request-id")).Send()
 
 	// trace
-	span := tracerProvider.Span(ctx, "database.AddCard")
+	ctx, span := tracerProvider.SpanCtx(ctx, "database.AddCard")
 	defer span.End()
 
 	// prepare
@@ -77,7 +77,7 @@ func (w WorkerRepository) AddCard(ctx context.Context, tx pgx.Tx, card model.Car
 	}
 
 	card.ID = id
-
+	
 	return &card, nil
 }
 
@@ -99,20 +99,23 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 	// prepare query
 	res_card := model.Card{}
 
-	query := `SELECT id, 
-					fk_account_id,
-					card_number, 
-					card_type,
-					holder,
-					card_model, 
-					status,
-					atc, 
-					expired_at, 
-					created_at,
-					updated_at, 
-					tenant_id
-				FROM public.card 
-				WHERE card_number = $1`
+	query := `SELECT  	cc.id,
+						ac.account_id, 
+						cc.fk_account_id,
+						cc.card_number, 
+						cc.card_type,
+						cc.holder,
+						cc.card_model, 
+						cc.status,
+						cc.atc, 
+						cc.expired_at, 
+						cc.created_at,
+						cc.updated_at, 
+						cc.tenant_id
+				FROM card cc,
+					account ac
+				WHERE card_number = $1
+				and ac.id = cc.fk_account_id`
 
 	// execute			
 	rows, err := conn.Query(ctx, query, card.CardNumber)
@@ -123,6 +126,7 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 
 	for rows.Next() {
 		err := rows.Scan( 	&res_card.ID,
+							&res_card.AccountID,
 							&res_card.FkAccountID,
 							&res_card.CardNumber, 
 							&res_card.Type,
