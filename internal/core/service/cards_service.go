@@ -86,6 +86,7 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 	headers := map[string]string{
 		"Content-Type":  "application/json;charset=UTF-8",
 		"X-Request-Id": trace_id,
+		"x-apigw-api-id": s.apiService[0].XApigwApiId,
 		"Host": s.apiService[0].HostName,
 	}
 	httpClient := go_core_api.HttpClient {
@@ -140,6 +141,7 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 	headers := map[string]string{
 		"Content-Type":  "application/json;charset=UTF-8",
 		"X-Request-Id": trace_id,
+		"x-apigw-api-id": s.apiService[0].XApigwApiId,
 		"Host": s.apiService[0].HostName,
 	}
 	httpClient := go_core_api.HttpClient {
