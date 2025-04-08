@@ -1,13 +1,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ing-go-onboarding
+  name: ing-go-card
   namespace: test-a
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/default-backend: "svc-go-onboarding"
+    nginx.ingress.kubernetes.io/default-backend: "svc-go-card"
     nginx.ingress.kubernetes.io/proxy-body-size: 10m
 spec:
   ingressClassName: nginx
@@ -21,4 +21,14 @@ spec:
             service:
               name: svc-go-card
               port:
-                number: 6000
+                number: 6001
+    - host: go-card.architecture.caradhras.io
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: svc-go-card
+              port:
+                number: 6001
