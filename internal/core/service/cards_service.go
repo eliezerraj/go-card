@@ -4,6 +4,9 @@ import(
 	"fmt"
 	"time"
 	"context"
+	"errors"
+	"net/http"	
+	"encoding/json"
 	"github.com/zeebo/blake3"
 
 	"github.com/rs/zerolog/log"
@@ -13,21 +16,43 @@ import(
 	"github.com/go-card/internal/adapter/database"
 
 	go_core_observ "github.com/eliezerraj/go-core/observability"
+	go_core_api "github.com/eliezerraj/go-core/api"
 )
 
 var tracerProvider go_core_observ.TracerProvider
 var childLogger = log.With().Str("component","go-card").Str("package","internal.core.service").Logger()
+var apiService go_core_api.ApiService
 
 type WorkerService struct {
-	workerRepository 	*database.WorkerRepository}
+	workerRepository 	*database.WorkerRepository
+	apiService			[]model.ApiService
+}
 
 // About create a new worker service
-func NewWorkerService(	workerRepository *database.WorkerRepository) *WorkerService{
+func NewWorkerService(	workerRepository 	*database.WorkerRepository,
+						apiService			[]model.ApiService,) *WorkerService{
 	childLogger.Info().Str("func","NewWorkerService").Send()
 
 	return &WorkerService{
+		apiService: apiService,
 		workerRepository: workerRepository,
 	}
+}
+
+// About handle/convert http status code
+func errorStatusCode(statusCode int) error{
+	var err error
+	switch statusCode {
+		case http.StatusUnauthorized:
+			err = erro.ErrUnauthorized
+		case http.StatusForbidden:
+			err = erro.ErrHTTPForbiden
+		case http.StatusNotFound:
+			err = erro.ErrNotFound
+		default:
+			err = erro.ErrServer
+		}
+	return err
 }
 
 // About create a card
@@ -36,6 +61,7 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 
 	// trace
 	span := tracerProvider.Span(ctx, "service.AddCard")
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 	defer span.End()
 	
 	// prepare database
@@ -55,6 +81,36 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 		span.End()
 	}()
 
+	// Get the Account ID (PK) from Account-service
+	// Set headers
+	headers := map[string]string{
+		"Content-Type":  "application/json;charset=UTF-8",
+		"X-Request-Id": trace_id,
+		"Host": s.apiService[0].HostName,
+	}
+	httpClient := go_core_api.HttpClient {
+		Url: 	s.apiService[0].Url + "/get/" + card.AccountID,
+		Method: s.apiService[0].Method,
+		Timeout: 15,
+		Headers: &headers,
+	}
+
+	res_payload, statusCode, err := apiService.CallRestApi(	ctx,
+															httpClient, 
+															nil)
+	
+	if err != nil {
+		return nil, errorStatusCode(statusCode)
+	}
+
+	jsonString, err  := json.Marshal(res_payload)
+	if err != nil {
+		return nil, errors.New(err.Error())
+    }
+	var account_parsed model.Account
+	json.Unmarshal(jsonString, &account_parsed)
+
+	card.FkAccountID = account_parsed.ID
 	// add card
 	res, err := s.workerRepository.AddCard(ctx, tx, card)
 	if err != nil {
@@ -70,14 +126,45 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 
 	// trace
 	span := tracerProvider.Span(ctx, "service.GetCard")
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 	defer span.End()
 	
 	// get card
-	res, err := s.workerRepository.GetCard(ctx, card)
+	res_card, err := s.workerRepository.GetCard(ctx, card)
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+
+	// Get the Account ID (PK) from Account-service
+	// Set headers
+	headers := map[string]string{
+		"Content-Type":  "application/json;charset=UTF-8",
+		"X-Request-Id": trace_id,
+		"Host": s.apiService[0].HostName,
+	}
+	httpClient := go_core_api.HttpClient {
+		Url: 	s.apiService[0].Url + "/getId/" + fmt.Sprintf("%v",res_card.FkAccountID),
+		Method: s.apiService[0].Method,
+		Timeout: 15,
+		Headers: &headers,
+	}
+	// get account_if from id (PK)
+	res_payload, statusCode, err := apiService.CallRestApi(	ctx,
+															httpClient, 
+															nil)
+	if err != nil {
+		return nil, errorStatusCode(statusCode)
+	}
+
+	jsonString, err  := json.Marshal(res_payload)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+	var account_parsed model.Account
+	json.Unmarshal(jsonString, &account_parsed)
+	res_card.AccountID = account_parsed.AccountID
+
+	return res_card, nil
 }
 
 // About update a update

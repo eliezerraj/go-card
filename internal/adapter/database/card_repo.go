@@ -100,7 +100,6 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 	res_card := model.Card{}
 
 	query := `SELECT  	cc.id,
-						ac.account_id, 
 						cc.fk_account_id,
 						cc.card_number, 
 						cc.card_type,
@@ -112,10 +111,8 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 						cc.created_at,
 						cc.updated_at, 
 						cc.tenant_id
-				FROM card cc,
-					account ac
-				WHERE card_number = $1
-				and ac.id = cc.fk_account_id`
+				FROM card cc
+				WHERE card_number = $1`
 
 	// execute			
 	rows, err := conn.Query(ctx, query, card.CardNumber)
@@ -126,7 +123,6 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 
 	for rows.Next() {
 		err := rows.Scan( 	&res_card.ID,
-							&res_card.AccountID,
 							&res_card.FkAccountID,
 							&res_card.CardNumber, 
 							&res_card.Type,
