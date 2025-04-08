@@ -11,6 +11,7 @@ type AppServer struct {
 	Server     		*Server     				`json:"server"`
 	ConfigOTEL		*go_core_observ.ConfigOTEL	`json:"otel_config"`
 	DatabaseConfig	*go_core_pg.DatabaseConfig  `json:"database"`
+	ApiService 		[]ApiService	`json:"api_endpoints"`
 }
 
 type InfoPod struct {
@@ -32,8 +33,26 @@ type Server struct {
 	CtxTimeout		int `json:"ctxTimeout"`
 }
 
+type ApiService struct {
+	Name			string `json:"name_service"`
+	Url				string `json:"url"`
+	Method			string `json:"method"`
+	Header_x_apigw_api_id	string `json:"x-apigw-api-id"`
+	HostName		string `json:"host_name"`
+}
+
 type MessageRouter struct {
 	Message			string `json:"message"`
+}
+
+type Account struct {
+	ID				int			`json:"id,omitempty"`
+	AccountID		string		`json:"account_id,omitempty"`
+	PersonID		string  	`json:"person_id,omitempty"`
+	CreatedAt		time.Time 	`json:"created_at,omitempty"`
+	UpdatedAt		*time.Time 	`json:"updated_at,omitempty"`
+	UserLastUpdate	*string  	`json:"user_last_update,omitempty"`
+	TenantId		string  	`json:"tenant_id,omitempty"`
 }
 
 type Card struct {

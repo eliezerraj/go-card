@@ -34,11 +34,13 @@ func init(){
 	infoPod, server := configuration.GetInfoPod()
 	configOTEL 		:= configuration.GetOtelEnv()
 	databaseConfig 	:= configuration.GetDatabaseEnv() 
+	apiService 	:= configuration.GetEndpointEnv() 
 
 	appServer.InfoPod = &infoPod
 	appServer.Server = &server
 	appServer.ConfigOTEL = &configOTEL
 	appServer.DatabaseConfig = &databaseConfig
+	appServer.ApiService = apiService
 }
 
 // Above main
@@ -70,7 +72,7 @@ func main (){
 
 	// wire	
 	database := database.NewWorkerRepository(&databasePGServer)
-	workerService := service.NewWorkerService(database)
+	workerService := service.NewWorkerService(database, appServer.ApiService)
 	httpRouters := api.NewHttpRouters(workerService)
 
 	// start server
