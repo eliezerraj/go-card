@@ -19,4 +19,4 @@ data:
   OTEL_EXPORTER_OTLP_ENDPOINT: "arch-eks-02-xray-collector.default.svc.cluster.local:4317"
   USE_STDOUT_TRACER_EXPORTER: "false"
   USE_OTLP_COLLECTOR: "true" 
-  AWS_CLOUDWATCH_LOG_GROUP_NAMES:"/dock/eks/eks-arch-01/go-card"
+  AWS_CLOUDWATCH_LOG_GROUP_NAMES: "/dock/eks/eks-arch-02/"

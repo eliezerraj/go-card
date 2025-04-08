@@ -260,10 +260,11 @@ Resources:
         Fn::Sub: arn:aws:apigateway:${AWS::Region}::/restapis/${ApiPrivateGateway}/stages/${ApiPrivateGateway.Stage}
       WebACLArn:
         Ref: WafaclArn
-
-Outputs:
-  ApiPrivateGateway:
-    Value:
-      Ref: ApiPrivateGateway
-    Export:
-      Name: ApiPrivateGateway
+        
+# Comment to avoid duplicity
+#Outputs:
+#  ApiPrivateGateway:
+#    Value:
+#      Ref: ApiPrivateGateway
+#    Export:
+#      Name: ApiPrivateGateway
