@@ -22,8 +22,8 @@ data:
   USE_OTLP_COLLECTOR: "true" 
   AWS_CLOUDWATCH_LOG_GROUP_NAMES: "/dock/eks/eks-arch-02"
 
-  NAME_SERVICE_01: "go-account"
-  URL_SERVICE_01: "https://vpce.global.dev.caradhras.io/pv"
-  METHOD_SERVICE_01: "GET"
-  X_APIGW_API_ID_SERVICE_01: "129t4y8eoj"
-  HOST_SERVICE_01: "go-account.architecture.caradhras.io"
+  NAME_SERVICE_00: "go-account"
+  URL_SERVICE_00: "https://vpce.global.dev.caradhras.io/pv"
+  METHOD_SERVICE_00: "GET"
+  X_APIGW_API_ID_SERVICE_00: "129t4y8eoj"
+  HOST_SERVICE_00: "go-account.architecture.caradhras.io"

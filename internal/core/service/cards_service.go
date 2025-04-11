@@ -40,7 +40,8 @@ func NewWorkerService(	workerRepository 	*database.WorkerRepository,
 }
 
 // About handle/convert http status code
-func errorStatusCode(statusCode int) error{
+func errorStatusCode(statusCode int, serviceName string) error{
+	childLogger.Info().Str("func","errorStatusCode").Interface("serviceName", serviceName).Interface("statusCode", statusCode).Send()
 	var err error
 	switch statusCode {
 		case http.StatusUnauthorized:
@@ -50,7 +51,7 @@ func errorStatusCode(statusCode int) error{
 		case http.StatusNotFound:
 			err = erro.ErrNotFound
 		default:
-			err = erro.ErrServer
+			err = errors.New(fmt.Sprintf("service %s in outage", serviceName))
 		}
 	return err
 }
@@ -101,7 +102,7 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 															nil)
 	
 	if err != nil {
-		return nil, errorStatusCode(statusCode)
+		return nil, errorStatusCode(statusCode, s.apiService[0].Name)
 	}
 
 	jsonString, err  := json.Marshal(res_payload)
@@ -155,7 +156,7 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 															httpClient, 
 															nil)
 	if err != nil {
-		return nil, errorStatusCode(statusCode)
+		return nil, errorStatusCode(statusCode, s.apiService[0].Name)
 	}
 
 	jsonString, err  := json.Marshal(res_payload)
