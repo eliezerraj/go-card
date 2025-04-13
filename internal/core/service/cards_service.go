@@ -132,6 +132,7 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 	defer span.End()
 	
 	// get card
+	card.Atc = 0
 	res_card, err := s.workerRepository.GetCard(ctx, card)
 	if err != nil {
 		return nil, err
