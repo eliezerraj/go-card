@@ -1,8 +1,9 @@
 SHELL=/bin/bash
 
 # Define environment variables
-export AUTH_TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJpc3MiOiJnby1vYXV0aC1sYW1iZGEiLCJ2ZXJzaW9uIjoiMyIsImp3dF9pZCI6IjU3NDVkNjlhLTAyZTItNDQyOS1hMTU1LWM5ZTUzMzMwNGFkYSIsInVzZXJuYW1lIjoiYWRtaW4iLCJzY29wZSI6WyJhZG1pbiJdLCJleHAiOjE3NDU5MTUwMTl9.aQSUdOZYM-EpdXkn_FXGp6MBnWRXn0u40r3jijEP-RdoE-4VLkRH0iJpzclPlZTTNb9cHeFIxaHAbH1sFwLN8Pzi8LjlP39g2X53wfn77xI_v_a0DtIwtGCIxd16cVyPS7578Jg4MXlAnxvsdsYOWG2ouTnx7FDgXcgxNJn92c1YuupXmWTRRCaoiqKHQqIFhvDUbAJcMwSHYMK9rzBHsssuFnV709jGrOyiBg18GdEKldeGZdWyw94_-K8HCjpW7DC9gz1Wex1VYkApNGHiSbtCu6zGrCwnWXD-AEMAjjlUD24f_pPwdxYXj4v8tPq28utwN8U83SOqXrjFC5x_Qn8tCuWMB2vBBmaAoaCnxnyLea1RDxL1GA4Xb3yrhuvGMMxFiYoMnSXchODGHASYMtLK601fzQpZX2LS1JJepje_b_FBRkEruHktwnIBjM8LgcIfvRhsljwCRF2glHBWT9BGmqYi9gO4TcfeKUUg_Few7FBNYDfvEPsYRKbIm4G3cdCmZdr12ElDpsrG2DKyvNdrgjT5Q3o9U7eHM3lE8wbEEw2EXtdNSm3fDK4KVRUm9mRyhA2a21huN8t5i-fYZHcXBYrtneVBLT2-gMIqb3GXdC-QPNj-2Te-4CT2IUgnPlKPtC3xDTDM6euaCs_OcOtd-Jym8aKnnU-Blssf5lc
-export URL_POST=https://go-global.architecture.caradhras.io/card/card
+export AUTH_TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJpc3MiOiJnby1vYXV0aC1sYW1iZGEiLCJ2ZXJzaW9uIjoiMyIsImp3dF9pZCI6Ijc1ZmE5YjExLTFlYzUtNGFhYi04YzBlLWYxZDUyZGRkYzg2NSIsInVzZXJuYW1lIjoiYWRtaW4iLCJzY29wZSI6WyJhZG1pbiJdLCJleHAiOjE3NDYzNDYzODZ9.BfOao-2LGwo_aFJcMmuuI-lD4F46B5Yr4_A3PbiH9WD3-V6qNUQEQQZ6O-wo0LVDe72clJimfyoyKAGagG4y14kZG6Zpt6JCbrvzZTRkreUmelXb7a3pl1__g3VGXhDwIH0V0O519M0Aa4HwteGiqposJNzUPtW11QCVmZDrnvTXXubV5FzS23uYg7LUJyOQovkCwb9So9nw3WD4heYne0PsfTkD8LQ8H1F42GPm60ncXyMT2Hj1txEJhMHdNhZ2dUeuc2lFwY7OAolOetlL5eb4iWAK9EDGgEboD-Zf8JbcF-Erzbho-Tj4f1b7b7-63Mx0_JGAQGDV8hTli3M1KLFAGVJXoyE3cVNlSi_jNnRQIkxLiZqrdoFDK8Md6v-QzoO7jB1QfMy4owpaixgl-tkymFogsnB5kjj9er5E5ulElNgJnFAZ3gvorrR0VZAeWpLT0ErKsGo2Q7Zsrt2RGjo5ticl-Fq2vxyRp8Rb9kWOrqsEj1ZFY_-Dpv-PjdOf1JMEgYQjKxz6nnS5Dy6t4JZ7h1jE1yiwYvzRmnsrSPD8z55fvaTvQmVfMKWkQtiwP6qcbjqJwM36JHFFp8bd3cmuusBBTDDuL1NlkzZdwBVkhgcCa2eQkIxM5XXUZtUsQ312iS10FIllDlkkM9hZ9188k8OVks23DxiSLIkHCyM
+export URL_POST_CARD=https://go-global.architecture.caradhras.io/card/card
+export URL_POST_ATC=https://go-global.architecture.caradhras.io/card/atc
 
 # Default target
 all: env load
@@ -11,18 +12,29 @@ all: env load
 env:
 	@echo "Current Environment Variables:"
 	@echo "AUTH_TOKEN=$(AUTH_TOKEN)"
-	@echo "URL_POST=$(URL_POST)"
+	@echo "URL_POST_CARD=$(URL_POST_CARD)"
+	@echo "URL_POST_ATC=$(URL_POST_ATC)"
 
 load:
 	@echo "Run Load Card..."
 
 	@for ((i=100; i<=999; i++)); do \
 		echo "Posting iteration $$i... {"card_number":"111.111.000.$$i","account_id":"ACC-$$i","holder":"holder-$$i","type":"CREDIT","model":"CHIP","status":"ISSUED"} "; \
-		curl -X POST $(URL_POST) \
+		curl -X POST $(URL_POST_CARD) \
 		    --header "Content-Type: application/json" \
 			--header "Authorization: $(AUTH_TOKEN)" \
 		    --data '{"card_number":"111.111.000.'$$i'","account_id":"ACC-'$$i'","holder":"holder-'$$i'","type":"CREDIT","model":"CHIP","status":"ISSUED"}'; \
 		echo ""; \
 	done
 
+siege_atc:
+	@echo "Run card atc ..."
+
+	@siege -c50 -t2m -d0.5 -v --content-type "application/json" --header="Authorization: $(AUTH_TOKEN)" '$(URL_POST_ATC) POST {"card_number": "111.111.111.100"}'
+
+siege_atc:
+	@echo "Run card atc ..."
+
+	@siege -c50 -t2m -d0.5 -v --content-type "application/json" --header="Authorization: $(AUTH_TOKEN)" '$(URL_POST_ATC) POST {"card_number": "111.111.111.100"}'
+	
 .PHONY: all env load

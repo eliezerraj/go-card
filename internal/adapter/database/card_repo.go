@@ -187,6 +187,7 @@ func (w WorkerRepository) UpdateCard(ctx context.Context, tx pgx.Tx, card model.
 	if err != nil {
 		return 0, errors.New(err.Error())
 	}
+
 	if int(row.RowsAffected()) == 0 {
 		return 0, erro.ErrUpdateRows
 	}

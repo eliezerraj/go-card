@@ -70,15 +70,16 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 
 	// trace
 	span := tracerProvider.Span(ctx, "service.AddCard")
-	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 	defer span.End()
-	
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
+
 	// prepare database
 	tx, conn, err := s.workerRepository.DatabasePGServer.StartTx(ctx)
 	if err != nil {
 		return nil, err
 	}
-	
+	defer s.workerRepository.DatabasePGServer.ReleaseTx(conn)
+
 	// handle connection
 	defer func() {
 		if err != nil {
@@ -86,7 +87,6 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 		} else {
 			tx.Commit(ctx)
 		}
-		s.workerRepository.DatabasePGServer.ReleaseTx(conn)
 		span.End()
 	}()
 
@@ -192,6 +192,7 @@ func (s *WorkerService) UpdateCard(ctx context.Context, card model.Card) (*model
 	if err != nil {
 		return nil, err
 	}
+	defer s.workerRepository.DatabasePGServer.ReleaseTx(conn)
 
 	// handle connection
 	defer func() {
@@ -200,7 +201,6 @@ func (s *WorkerService) UpdateCard(ctx context.Context, card model.Card) (*model
 		} else {
 			tx.Commit(ctx)
 		}
-		s.workerRepository.DatabasePGServer.ReleaseTx(conn)
 		span.End()
 	}()
 

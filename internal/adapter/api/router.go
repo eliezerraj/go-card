@@ -80,9 +80,9 @@ func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","AddCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 	
 	span := tracerProvider.Span(req.Context(), "adapter.api.AddCard")
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
-
 	defer span.End()
+	
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
@@ -111,9 +111,8 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","GetCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	span := tracerProvider.Span(req.Context(), "adapter.api.GetCard")
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
-
 	defer span.End()
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 
 	vars := mux.Vars(req)
 	varID := vars["id"]
@@ -140,8 +139,8 @@ func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) erro
 	childLogger.Info().Str("func","UpdateCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	span := tracerProvider.Span(req.Context(), "adapter.api.UpdateCard")
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 	defer span.End()
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
@@ -170,8 +169,8 @@ func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request)
 	childLogger.Info().Str("func","CreateCardToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 	
 	span := tracerProvider.Span(req.Context(), "adapter.api.CreateCardToken")
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 	defer span.End()
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
@@ -200,8 +199,8 @@ func (h *HttpRouters) GetCardToken(rw http.ResponseWriter, req *http.Request) er
 	childLogger.Info().Str("func","GetCardToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	span := tracerProvider.Span(req.Context(), "adapter.api.GetCardToken")
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 	defer span.End()
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 
 	vars := mux.Vars(req)
 	varID := vars["id"]
