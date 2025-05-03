@@ -66,17 +66,28 @@ func (h *HttpRouters) Context(rw http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(rw).Encode(fmt.Sprintf("%v",contextValues))
 }
 
+// About show pgx stats
+func (h *HttpRouters) Stat(rw http.ResponseWriter, req *http.Request) {
+	childLogger.Info().Str("func","Stat").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
+	
+	res := h.workerService.Stat(req.Context())
+
+	json.NewEncoder(rw).Encode(res)
+}
+
 // About add card
 func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","AddCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 	
 	span := tracerProvider.Span(req.Context(), "adapter.api.AddCard")
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	defer span.End()
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -85,9 +96,9 @@ func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -100,6 +111,8 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","GetCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	span := tracerProvider.Span(req.Context(), "adapter.api.GetCard")
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	defer span.End()
 
 	vars := mux.Vars(req)
@@ -112,9 +125,9 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -127,12 +140,13 @@ func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) erro
 	childLogger.Info().Str("func","UpdateCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	span := tracerProvider.Span(req.Context(), "adapter.api.UpdateCard")
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 	defer span.End()
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -141,9 +155,9 @@ func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) erro
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -156,12 +170,13 @@ func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request)
 	childLogger.Info().Str("func","CreateCardToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 	
 	span := tracerProvider.Span(req.Context(), "adapter.api.CreateCardToken")
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 	defer span.End()
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -170,9 +185,9 @@ func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request)
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -185,6 +200,7 @@ func (h *HttpRouters) GetCardToken(rw http.ResponseWriter, req *http.Request) er
 	childLogger.Info().Str("func","GetCardToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	span := tracerProvider.Span(req.Context(), "adapter.api.GetCardToken")
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 	defer span.End()
 
 	vars := mux.Vars(req)
@@ -197,9 +213,9 @@ func (h *HttpRouters) GetCardToken(rw http.ResponseWriter, req *http.Request) er
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id ,http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}

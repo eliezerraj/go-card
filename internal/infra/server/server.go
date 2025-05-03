@@ -88,6 +88,9 @@ func (h HttpServer) StartHttpAppServer(	ctx context.Context,
 	header := myRouter.Methods(http.MethodGet, http.MethodOptions).Subrouter()
     header.HandleFunc("/header", httpRouters.Header)
 
+	stat := myRouter.Methods(http.MethodGet, http.MethodOptions).Subrouter()
+    stat.HandleFunc("/stat", httpRouters.Stat)
+
 	wk_ctx := myRouter.Methods(http.MethodGet, http.MethodOptions).Subrouter()
     wk_ctx.HandleFunc("/context", httpRouters.Context)
 
