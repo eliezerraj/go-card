@@ -35,6 +35,6 @@ siege_atc:
 siege_atc:
 	@echo "Run card atc ..."
 
-	@siege -c50 -t2m -d0.5 -v --content-type "application/json" --header="Authorization: $(AUTH_TOKEN)" '$(URL_POST_ATC) POST {"card_number": "111.111.111.100"}'
+	@siege -c15 -t30s -d0.5 -v --content-type "application/json" --header="Authorization: $(AUTH_TOKEN)" '$(URL_POST_ATC) POST {"card_number": "111.111.111.100"}'
 	
 .PHONY: all env load
