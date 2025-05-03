@@ -15,6 +15,7 @@ import(
 	"github.com/go-card/internal/core/erro"
 	"github.com/go-card/internal/adapter/database"
 
+	go_core_pg "github.com/eliezerraj/go-core/database/pg"
 	go_core_observ "github.com/eliezerraj/go-core/observability"
 	go_core_api "github.com/eliezerraj/go-core/api"
 )
@@ -54,6 +55,13 @@ func errorStatusCode(statusCode int, serviceName string) error{
 			err = errors.New(fmt.Sprintf("service %s in outage", serviceName))
 		}
 	return err
+}
+
+// About handle/convert http status code
+func (s *WorkerService) Stat(ctx context.Context) (go_core_pg.PoolStats){
+	childLogger.Info().Str("func","Stat").Interface("trace-resquest-id", ctx.Value("trace-request-id")).Send()
+
+	return s.workerRepository.Stat(ctx)
 }
 
 // About create a card
