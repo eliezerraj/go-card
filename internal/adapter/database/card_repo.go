@@ -61,7 +61,7 @@ func (w WorkerRepository) AddCard(ctx context.Context, tx pgx.Tx, card model.Car
 
 	// prepare
 	card.CreatedAt = time.Now()
-	card.ExpiredAt = time.Now().AddDate(5, 0, 0) // add 5year
+	card.ExpiredAt = time.Now().AddDate(5, 0, 0) // add 5 year
 	card.Atc = 0
 
 	//query
