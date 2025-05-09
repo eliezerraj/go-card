@@ -25,18 +25,21 @@ var childLogger = log.With().Str("component","go-card").Str("package","internal.
 var apiService go_core_api.ApiService
 
 type WorkerService struct {
+	goCoreRestApiService	go_core_api.ApiService
 	workerRepository 	*database.WorkerRepository
 	apiService			[]model.ApiService
 }
 
 // About create a new worker service
-func NewWorkerService(	workerRepository 	*database.WorkerRepository,
-						apiService			[]model.ApiService,) *WorkerService{
+func NewWorkerService(	goCoreRestApiService	go_core_api.ApiService,	
+						workerRepository 		*database.WorkerRepository,
+						apiService				[]model.ApiService,) *WorkerService{
 	childLogger.Info().Str("func","NewWorkerService").Send()
 
 	return &WorkerService{
-		apiService: apiService,
-		workerRepository: workerRepository,
+		goCoreRestApiService: 	goCoreRestApiService,
+		apiService: 			apiService,
+		workerRepository: 		workerRepository,
 	}
 }
 
@@ -105,9 +108,10 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 		Headers: &headers,
 	}
 
-	res_payload, statusCode, err := apiService.CallRestApi(	ctx,
-															httpClient, 
-															nil)
+	res_payload, statusCode, err := apiService.CallRestApiV1(	ctx,
+																s.goCoreRestApiService.Client,
+																httpClient, 
+																nil)
 	
 	if err != nil {
 		return nil, errorStatusCode(statusCode, s.apiService[0].Name)
@@ -161,9 +165,10 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 		Headers: &headers,
 	}
 	// get account_if from id (PK)
-	res_payload, statusCode, err := apiService.CallRestApi(	ctx,
-															httpClient, 
-															nil)
+	res_payload, statusCode, err := apiService.CallRestApiV1(	ctx,
+																s.goCoreRestApiService.Client,
+																httpClient, 
+																nil)
 	if err != nil {
 		return nil, errorStatusCode(statusCode, s.apiService[0].Name)
 	}
