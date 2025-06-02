@@ -8,7 +8,7 @@ on:
       AWS_ACCOUNT_ID:
         description: 'AWS account id'
         required: true
-        default: '908671954593'
+        default: '992382474575'
       REGION:
         description: 'AWS Region'
         required: true
