@@ -224,6 +224,8 @@ func (s *WorkerService) UpdateCard(ctx context.Context, card model.Card) (*model
 		return nil, erro.ErrUpdate
 	}
 
+	tx.Commit(ctx) // commit to get the new values updated below
+
 	//Get atc data
 	res_card, err := s.workerRepository.GetCard(ctx, card)
 	if err != nil {
@@ -301,3 +303,4 @@ func (s * WorkerService) GetCardToken(ctx context.Context, card model.Card) (*[]
 
 	return res, nil
 }
+

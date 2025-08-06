@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+	"time"
 	"fmt"
 	"encoding/json"
 	"reflect"
@@ -138,9 +140,12 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","UpdateCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-	span := tracerProvider.Span(req.Context(), "adapter.api.UpdateCard")
+    ctx, cancel := context.WithTimeout(req.Context(), 10 *time.Second)
+    defer cancel()
+
+	span := tracerProvider.Span(ctx, "adapter.api.UpdateCard")
 	defer span.End()
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
@@ -150,7 +155,7 @@ func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) erro
     }
 	defer req.Body.Close()
 
-	res, err := h.workerService.UpdateCard(req.Context(), card)
+	res, err := h.workerService.UpdateCard(ctx, card)
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:

@@ -28,11 +28,6 @@ func GetInfoPod() (	model.InfoPod, model.Server) {
 	var infoPod 	model.InfoPod
 	var server		model.Server
 
-	server.ReadTimeout = 60
-	server.WriteTimeout = 60
-	server.IdleTimeout = 60
-	server.CtxTimeout = 60
-
 	if os.Getenv("API_VERSION") !=  "" {
 		infoPod.ApiVersion = os.Getenv("API_VERSION")
 	}
@@ -86,5 +81,18 @@ func GetInfoPod() (	model.InfoPod, model.Server) {
 		server.Port = intVar
 	}
 
+	server.ReadTimeout = 60
+	server.WriteTimeout = 60
+	server.IdleTimeout = 60
+	server.CtxTimeout = 60
+
+	if os.Getenv("CTX_TIMEOUT") !=  "" {
+		intVar, _ := strconv.Atoi(os.Getenv("CTX_TIMEOUT"))
+		server.CtxTimeout = intVar
+		server.WriteTimeout = intVar
+		server.IdleTimeout = intVar
+		server.ReadTimeout = intVar
+	}
+	
 	return infoPod, server
 }

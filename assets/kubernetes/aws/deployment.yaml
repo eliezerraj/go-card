@@ -65,7 +65,7 @@ spec:
             failureThreshold: 3
             successThreshold: 1
             timeoutSeconds: 10
-        livenessProbe:
+        livenessProbe: 
             exec:
               command:
               - /bin/sh
