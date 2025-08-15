@@ -26,8 +26,8 @@ var apiService go_core_api.ApiService
 
 type WorkerService struct {
 	goCoreRestApiService	go_core_api.ApiService
-	workerRepository 	*database.WorkerRepository
-	apiService			[]model.ApiService
+	workerRepository 		*database.WorkerRepository
+	apiService				[]model.ApiService
 }
 
 // About create a new worker service
