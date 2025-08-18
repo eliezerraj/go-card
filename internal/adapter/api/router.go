@@ -28,14 +28,17 @@ var tracerProvider go_core_observ.TracerProvider
 
 type HttpRouters struct {
 	workerService 	*service.WorkerService
+	ctxTimeout		time.Duration
 }
 
 // Above create routers
-func NewHttpRouters(workerService *service.WorkerService) HttpRouters {
+func NewHttpRouters(workerService *service.WorkerService,
+					ctxTimeout	time.Duration) HttpRouters {
 	childLogger.Info().Str("func","NewHttpRouters").Send()
 
 	return HttpRouters{
 		workerService: workerService,
+		ctxTimeout: ctxTimeout,
 	}
 }
 
@@ -80,11 +83,14 @@ func (h *HttpRouters) Stat(rw http.ResponseWriter, req *http.Request) {
 // About add card
 func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","AddCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
-	
-	span := tracerProvider.Span(req.Context(), "adapter.api.AddCard")
+
+	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
+    defer cancel()
+
+	span := tracerProvider.Span(ctx, "adapter.api.AddCard")
 	defer span.End()
 	
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
@@ -94,7 +100,7 @@ func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
     }
 	defer req.Body.Close()
 
-	res, err := h.workerService.AddCard(req.Context(), card)
+	res, err := h.workerService.AddCard(ctx, card)
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
@@ -112,9 +118,12 @@ func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","GetCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-	span := tracerProvider.Span(req.Context(), "adapter.api.GetCard")
+	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
+    defer cancel()
+
+	span := tracerProvider.Span(ctx, "adapter.api.GetCard")
 	defer span.End()
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	vars := mux.Vars(req)
 	varID := vars["id"]
@@ -122,7 +131,7 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 	card := model.Card{}
 	card.CardNumber = varID
 
-	res, err := h.workerService.GetCard(req.Context(), card)
+	res, err := h.workerService.GetCard(ctx, card)
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
@@ -140,7 +149,7 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","UpdateCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-    ctx, cancel := context.WithTimeout(req.Context(), 10 *time.Second)
+    ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
 	span := tracerProvider.Span(ctx, "adapter.api.UpdateCard")
@@ -172,10 +181,13 @@ func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) erro
 // About add card
 func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","CreateCardToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
-	
-	span := tracerProvider.Span(req.Context(), "adapter.api.CreateCardToken")
+
+	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
+    defer cancel()
+
+	span := tracerProvider.Span(ctx, "adapter.api.CreateCardToken")
 	defer span.End()
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
@@ -185,7 +197,7 @@ func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request)
     }
 	defer req.Body.Close()
 
-	res, err := h.workerService.CreateCardToken(req.Context(), card)
+	res, err := h.workerService.CreateCardToken(ctx, card)
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
@@ -203,9 +215,12 @@ func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request)
 func (h *HttpRouters) GetCardToken(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","GetCardToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-	span := tracerProvider.Span(req.Context(), "adapter.api.GetCardToken")
+	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
+    defer cancel()
+
+	span := tracerProvider.Span(ctx, "adapter.api.GetCardToken")
 	defer span.End()
-	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	vars := mux.Vars(req)
 	varID := vars["id"]
@@ -213,7 +228,7 @@ func (h *HttpRouters) GetCardToken(rw http.ResponseWriter, req *http.Request) er
 	card := model.Card{}
 	card.TokenData = varID
 
-	res, err := h.workerService.GetCardToken(req.Context(), card)
+	res, err := h.workerService.GetCardToken(ctx, card)
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:

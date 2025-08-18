@@ -26,8 +26,8 @@ var apiService go_core_api.ApiService
 
 type WorkerService struct {
 	goCoreRestApiService	go_core_api.ApiService
-	workerRepository 	*database.WorkerRepository
-	apiService			[]model.ApiService
+	workerRepository 		*database.WorkerRepository
+	apiService				[]model.ApiService
 }
 
 // About create a new worker service
@@ -44,8 +44,9 @@ func NewWorkerService(	goCoreRestApiService	go_core_api.ApiService,
 }
 
 // About handle/convert http status code
-func errorStatusCode(statusCode int, serviceName string) error{
+func errorStatusCode(statusCode int, serviceName string, msg_err error) error{
 	childLogger.Info().Str("func","errorStatusCode").Interface("serviceName", serviceName).Interface("statusCode", statusCode).Send()
+
 	var err error
 	switch statusCode {
 		case http.StatusUnauthorized:
@@ -55,7 +56,7 @@ func errorStatusCode(statusCode int, serviceName string) error{
 		case http.StatusNotFound:
 			err = erro.ErrNotFound
 		default:
-			err = errors.New(fmt.Sprintf("service %s in outage", serviceName))
+			err = errors.New(fmt.Sprintf("service %s in outage => cause error: %s", serviceName, msg_err.Error() ))
 		}
 	return err
 }
@@ -114,7 +115,7 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 																nil)
 	
 	if err != nil {
-		return nil, errorStatusCode(statusCode, s.apiService[0].Name)
+		return nil, errorStatusCode(statusCode, s.apiService[0].Name, err)
 	}
 
 	jsonString, err  := json.Marshal(res_payload)
@@ -170,7 +171,7 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 																httpClient, 
 																nil)
 	if err != nil {
-		return nil, errorStatusCode(statusCode, s.apiService[0].Name)
+		return nil, errorStatusCode(statusCode, s.apiService[0].Name, err)
 	}
 
 	jsonString, err  := json.Marshal(res_payload)
@@ -303,4 +304,3 @@ func (s * WorkerService) GetCardToken(ctx context.Context, card model.Card) (*[]
 
 	return res, nil
 }
-

@@ -49,7 +49,7 @@ func main (){
 	childLogger.Info().Str("func","main").Interface("appServer",appServer).Send()
 
 	ctx, cancel := context.WithTimeout(	context.Background(), 
-										time.Duration( appServer.Server.CtxTimeout ) * time.Second)
+										time.Duration( appServer.Server.ReadTimeout ) * time.Second)
 	defer cancel()
 
 	// Open Database
@@ -79,7 +79,7 @@ func main (){
 	workerService := service.NewWorkerService(	*coreRestApiService,
 												database, 
 												appServer.ApiService)
-	httpRouters := api.NewHttpRouters(workerService)
+	httpRouters := api.NewHttpRouters(workerService, time.Duration(appServer.Server.CtxTimeout))
 
 	// start server
 	httpServer := server.NewHttpAppServer(appServer.Server)
