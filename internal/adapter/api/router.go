@@ -28,14 +28,17 @@ var tracerProvider go_core_observ.TracerProvider
 
 type HttpRouters struct {
 	workerService 	*service.WorkerService
+	ctxTimeout		time.Duration
 }
 
 // Above create routers
-func NewHttpRouters(workerService *service.WorkerService) HttpRouters {
+func NewHttpRouters(workerService *service.WorkerService,
+					ctxTimeout	time.Duration) HttpRouters {
 	childLogger.Info().Str("func","NewHttpRouters").Send()
 
 	return HttpRouters{
 		workerService: workerService,
+		ctxTimeout: ctxTimeout,
 	}
 }
 
@@ -81,7 +84,7 @@ func (h *HttpRouters) Stat(rw http.ResponseWriter, req *http.Request) {
 func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","AddCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-	ctx, cancel := context.WithTimeout(req.Context(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
 	span := tracerProvider.Span(ctx, "adapter.api.AddCard")
@@ -115,7 +118,7 @@ func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","GetCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-	ctx, cancel := context.WithTimeout(req.Context(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
 	span := tracerProvider.Span(ctx, "adapter.api.GetCard")
@@ -146,7 +149,7 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","UpdateCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-    ctx, cancel := context.WithTimeout(req.Context(), 5 * time.Second)
+    ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
 	span := tracerProvider.Span(ctx, "adapter.api.UpdateCard")
@@ -179,7 +182,7 @@ func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) erro
 func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","CreateCardToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-	ctx, cancel := context.WithTimeout(req.Context(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
 	span := tracerProvider.Span(ctx, "adapter.api.CreateCardToken")
@@ -212,7 +215,7 @@ func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request)
 func (h *HttpRouters) GetCardToken(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","GetCardToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-	ctx, cancel := context.WithTimeout(req.Context(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
 	span := tracerProvider.Span(ctx, "adapter.api.GetCardToken")
