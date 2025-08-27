@@ -81,6 +81,24 @@ func (h *HttpRouters) Stat(rw http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(rw).Encode(res)
 }
 
+// About handle error
+func (h *HttpRouters) ErrorHandler(trace_id string, err error) *coreJson.APIError {
+	if strings.Contains(err.Error(), "context deadline exceeded") {
+    	err = erro.ErrTimeout
+	} 
+	switch err {
+	case erro.ErrBadRequest:
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
+	case erro.ErrNotFound:
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
+	case erro.ErrTimeout:
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusGatewayTimeout)
+	default:
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
+	}
+	return &core_apiError
+}
+
 // About add card
 func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 	childLogger.Info().Str("func","AddCard").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
@@ -96,25 +114,13 @@ func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
-		return &core_apiError
+		return h.ErrorHandler(trace_id, erro.ErrBadRequest)
     }
 	defer req.Body.Close()
 
 	res, err := h.workerService.AddCard(ctx, card)
 	if err != nil {
-		if strings.Contains(err.Error(), "context deadline exceeded") {
-    		err = erro.ErrTimeout
-		} 
-		switch err {
-		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
-		case erro.ErrTimeout:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusGatewayTimeout)
-		default:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
-		}
-		return &core_apiError
+		return h.ErrorHandler(trace_id, err)
 	}
 	
 	return core_json.WriteJSON(rw, http.StatusOK, res)
@@ -139,18 +145,7 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 
 	res, err := h.workerService.GetCard(ctx, card)
 	if err != nil {
-		if strings.Contains(err.Error(), "context deadline exceeded") {
-    		err = erro.ErrTimeout
-		} 
-		switch err {
-		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
-		case erro.ErrTimeout:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusGatewayTimeout)
-		default:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
-		}
-		return &core_apiError
+		return h.ErrorHandler(trace_id, err)
 	}
 	
 	return core_json.WriteJSON(rw, http.StatusOK, res)
@@ -170,25 +165,13 @@ func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) erro
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
-		return &core_apiError
+		return h.ErrorHandler(trace_id, erro.ErrBadRequest)
     }
 	defer req.Body.Close()
 
 	res, err := h.workerService.UpdateCard(ctx, card)
 	if err != nil {
-		if strings.Contains(err.Error(), "context deadline exceeded") {
-    		err = erro.ErrTimeout
-		} 
-		switch err {
-		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
-		case erro.ErrTimeout:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusGatewayTimeout)
-		default:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
-		}
-		return &core_apiError
+		return h.ErrorHandler(trace_id, err)
 	}
 	
 	return core_json.WriteJSON(rw, http.StatusOK, res)
@@ -208,25 +191,13 @@ func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request)
 	card := model.Card{}
 	err := json.NewDecoder(req.Body).Decode(&card)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
-		return &core_apiError
+		return h.ErrorHandler(trace_id, erro.ErrBadRequest)
     }
 	defer req.Body.Close()
 
 	res, err := h.workerService.CreateCardToken(ctx, card)
 	if err != nil {
-		if strings.Contains(err.Error(), "context deadline exceeded") {
-    		err = erro.ErrTimeout
-		} 
-		switch err {
-		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
-		case erro.ErrTimeout:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusGatewayTimeout)
-		default:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
-		}
-		return &core_apiError
+		return h.ErrorHandler(trace_id, err)
 	}
 	
 	return core_json.WriteJSON(rw, http.StatusOK, res)
@@ -251,20 +222,7 @@ func (h *HttpRouters) GetCardToken(rw http.ResponseWriter, req *http.Request) er
 
 	res, err := h.workerService.GetCardToken(ctx, card)
 	if err != nil {
-		
-		if strings.Contains(err.Error(), "context deadline exceeded") {
-    		err = erro.ErrTimeout
-		} 		
-		
-		switch err {
-		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, trace_id ,http.StatusNotFound)
-		case erro.ErrTimeout:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusGatewayTimeout)
-		default:
-			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
-		}
-		return &core_apiError
+		return h.ErrorHandler(trace_id, err)
 	}
 	
 	return core_json.WriteJSON(rw, http.StatusOK, res)

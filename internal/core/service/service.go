@@ -105,7 +105,7 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 	httpClient := go_core_api.HttpClient {
 		Url: 	s.apiService[0].Url + "/get/" + card.AccountID,
 		Method: s.apiService[0].Method,
-		Timeout: 15,
+		Timeout: s.apiService[0].HttpTimeout,
 		Headers: &headers,
 	}
 
@@ -162,7 +162,7 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 	httpClient := go_core_api.HttpClient {
 		Url: 	s.apiService[0].Url + "/getId/" + fmt.Sprintf("%v",res_card.FkAccountID),
 		Method: s.apiService[0].Method,
-		Timeout: 15,
+		Timeout: s.apiService[0].HttpTimeout,
 		Headers: &headers,
 	}
 	// get account_if from id (PK)

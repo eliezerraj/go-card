@@ -140,6 +140,10 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 		return nil, errors.New(err.Error())
 	}
 	defer rows.Close()
+    if err := rows.Err(); err != nil {
+		childLogger.Error().Err(err).Msg("fatal error closing rows")
+        return nil, errors.New(err.Error())
+    }
 
 	for rows.Next() {
 		err := rows.Scan( 	&res_card.ID,
@@ -270,7 +274,11 @@ func (w *WorkerRepository) GetCardToken(ctx context.Context, card model.Card) (*
 		return nil, errors.New(err.Error())
 	}
 	defer rows.Close()
-
+    if err := rows.Err(); err != nil {
+		childLogger.Error().Err(err).Msg("fatal error closing rows")
+        return nil, errors.New(err.Error())
+    }
+	
 	for rows.Next() {
 		err := rows.Scan( 	&res_card.ID, 
 							&res_card.CardNumber,
