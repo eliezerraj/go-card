@@ -20,9 +20,11 @@ import(
 	go_core_api "github.com/eliezerraj/go-core/api"
 )
 
-var tracerProvider go_core_observ.TracerProvider
-var childLogger = log.With().Str("component","go-card").Str("package","internal.core.service").Logger()
-var apiService go_core_api.ApiService
+var (
+	tracerProvider go_core_observ.TracerProvider
+	childLogger = log.With().Str("component","go-card").Str("package","internal.core.service").Logger()
+	apiService go_core_api.ApiService
+)
 
 type WorkerService struct {
 	goCoreRestApiService	go_core_api.ApiService
@@ -95,6 +97,7 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 	}()
 
 	// Get the Account ID (PK) from Account-service
+
 	// Set headers
 	headers := map[string]string{
 		"Content-Type":  "application/json;charset=UTF-8",
@@ -102,6 +105,7 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 		"x-apigw-api-id": s.apiService[0].XApigwApiId,
 		"Host": s.apiService[0].HostName,
 	}
+	// Set client http	
 	httpClient := go_core_api.HttpClient {
 		Url: 	s.apiService[0].Url + "/get/" + card.AccountID,
 		Method: s.apiService[0].Method,
@@ -113,7 +117,6 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 																s.goCoreRestApiService.Client,
 																httpClient, 
 																nil)
-	
 	if err != nil {
 		return nil, errorStatusCode(statusCode, s.apiService[0].Name, err)
 	}
@@ -125,7 +128,9 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 	var account_parsed model.Account
 	json.Unmarshal(jsonString, &account_parsed)
 
+	// prepare data, set ID (PK_)
 	card.FkAccountID = account_parsed.ID
+
 	// add card
 	res, err := s.workerRepository.AddCard(ctx, tx, card)
 	if err != nil {
@@ -152,6 +157,7 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 	}
 
 	// Get the Account ID (PK) from Account-service
+
 	// Set headers
 	headers := map[string]string{
 		"Content-Type":  "application/json;charset=UTF-8",
@@ -159,6 +165,8 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 		"x-apigw-api-id": s.apiService[0].XApigwApiId,
 		"Host": s.apiService[0].HostName,
 	}
+
+	// Set client http	
 	httpClient := go_core_api.HttpClient {
 		Url: 	s.apiService[0].Url + "/getId/" + fmt.Sprintf("%v",res_card.FkAccountID),
 		Method: s.apiService[0].Method,

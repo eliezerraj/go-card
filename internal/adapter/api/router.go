@@ -21,11 +21,12 @@ import (
 	go_core_observ "github.com/eliezerraj/go-core/observability"
 )
 
-var childLogger = log.With().Str("component", "go-card").Str("package", "internal.adapter.api").Logger()
-
-var core_json coreJson.CoreJson
-var core_apiError coreJson.APIError
-var tracerProvider go_core_observ.TracerProvider
+var (
+	childLogger = log.With().Str("component", "go-card").Str("package", "internal.adapter.api").Logger()
+	core_json coreJson.CoreJson
+	core_apiError coreJson.APIError
+	tracerProvider go_core_observ.TracerProvider
+)
 
 type HttpRouters struct {
 	workerService 	*service.WorkerService
