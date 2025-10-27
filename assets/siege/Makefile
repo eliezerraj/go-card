@@ -2,9 +2,8 @@ SHELL=/bin/bash
 
 # Define environment variables
 export AUTH_TOKEN=
-export URL_POST_CARD=https://go-global.architecture.caradhras.io/card/card
-export URL_POST_ATC=https://go-global.architecture.caradhras.io/card/atc
-export URL_POST_TOKEN=https://go-global.architecture.caradhras.io/card/cardToken/696673f52a85f4b994700313b935f908b3526f849a1c5d348dee63265817b758
+
+export URL_POST_CARD=https://go-global-apex.architecture.caradhras.io/card/card
 
 # Default target
 all: env load
@@ -14,17 +13,19 @@ env:
 	@echo "Current Environment Variables:"
 	@echo "AUTH_TOKEN=$(AUTH_TOKEN)"
 	@echo "URL_POST_CARD=$(URL_POST_CARD)"
-	@echo "URL_POST_ATC=$(URL_POST_ATC)"
 
 load:
 	@echo "Run Load Card..."
-
-	@for ((i=100; i<=999; i++)); do \
-		echo "Posting iteration $$i... {"card_number":"111.111.000.$$i","account_id":"ACC-$$i","holder":"holder-$$i","type":"CREDIT","model":"CHIP","status":"ISSUED"} "; \
+	@PAN=555000000000; \
+	for ((i=1; i<=1000; i++)); do \
+		ACC_ID=$$((4999 + i)); \
+		PAN_ID=$$((PAN + ACC_ID)); \
+		CARD_PAN="$$(printf "%012d" $$PAN_ID | sed -E 's/(.{3})(.{3})(.{3})(.{3})/\1.\2.\3.\4/')"; \
+		echo "Posting iteration $$i... {"card_number":"$$CARD_PAN","account_id":"ACC-$$ACC_ID","holder":"holder-$$ACC_ID","type":"CREDIT","model":"CHIP","status":"ISSUED"} "; \
 		curl -X POST $(URL_POST_CARD) \
 		    --header "Content-Type: application/json" \
 			--header "Authorization: $(AUTH_TOKEN)" \
-		    --data '{"card_number":"111.111.000.'$$i'","account_id":"ACC-'$$i'","holder":"holder-'$$i'","type":"CREDIT","model":"CHIP","status":"ISSUED"}'; \
+		    --data '{"card_number":"'$$CARD_PAN'","account_id":"ACC-'$$ACC_ID'","holder":"holder-'$$ACC_ID'","type":"CREDIT","model":"CHIP","status":"ISSUED"}'; \
 		echo ""; \
 	done
 
