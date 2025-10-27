@@ -60,7 +60,7 @@ func (h HttpServer) StartHttpAppServer(	ctx context.Context,
 											&infoTrace)
 	
 	if tp != nil {
-		otel.SetTextMapPropagator(xray.Propagator{} // propagation.TraceContext{} xray.Propagator{}
+		otel.SetTextMapPropagator(xray.Propagator{}) // propagation.TraceContext{} xray.Propagator{}
 		otel.SetTracerProvider(tp)
 	}
 
