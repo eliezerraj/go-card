@@ -17,7 +17,7 @@ spec:
       labels:
         app: *app-name
     spec:
-      serviceAccountName: sa-go-card
+      serviceAccountName: sa-go-card-pod-identity
       volumes:
       - name: volume-secret
         secret:
