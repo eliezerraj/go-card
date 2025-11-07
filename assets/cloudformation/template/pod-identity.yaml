@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EKS Pod Identity Example
+
+Parameters:
+  ClusterName:
+    Type: String
+    Description: The name of your EKS cluster.
+    Default: arch-eks-02
+  Namespace:
+    Type: String
+    Description: The Kubernetes namespace where the service account resides.
+    Default: test-a
+  ServiceAccountName:
+    Type: String
+    Description: The name of the Kubernetes service account.
+    Default: sa-go-card-pod-identity
+
+Resources:
+  PodIdentityIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: PodIdentityRoleGoCard
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'pods.eks.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+              - 'sts:TagSession'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+
+  # Custom Resource to create EKS Pod Identity Association
+  PodIdentityAssociation:
+    Type: AWS::EKS::PodIdentityAssociation
+    Properties:
+      ClusterName: !Ref ClusterName
+      Namespace: !Ref Namespace
+      ServiceAccount: !Ref ServiceAccountName
+      RoleArn: !GetAtt PodIdentityIAMRole.Arn
