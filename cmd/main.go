@@ -57,9 +57,9 @@ func main (){
 		databasePGServer, err = databasePGServer.NewDatabasePGServer(ctx, *appServer.DatabaseConfig)
 		if err != nil {
 			if count < 3 {
-				log.Error().Err(err).Msg("error open database... trying again !!")
+				childLogger.Error().Err(err).Msg("error open database... trying again !")
 			} else {
-				log.Error().Err(err).Msg("fatal error open Database aborting")
+				childLogger.Error().Err(err).Msg("fatal error open Database aborting")
 				panic(err)
 			}
 			time.Sleep(3 * time.Second) //backoff
@@ -79,6 +79,14 @@ func main (){
 												appServer.ApiService)
 	httpRouters := api.NewHttpRouters(workerService, time.Duration(appServer.Server.CtxTimeout))
 
+	// Services Health Check
+	err = workerService.HealthCheck(ctx)
+	if err != nil {
+		childLogger.Error().Err(err).Msg("fatal error health check aborting")
+	} else {
+		childLogger.Info().Msg("SERVICES HEALTH CHECK OK")
+	}
+	
 	// start server
 	httpServer := server.NewHttpAppServer(appServer.Server)
 	httpServer.StartHttpAppServer(ctx, &httpRouters, &appServer)

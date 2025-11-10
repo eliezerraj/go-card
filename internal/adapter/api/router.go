@@ -107,7 +107,7 @@ func (h *HttpRouters) AddCard(rw http.ResponseWriter, req *http.Request) error {
 	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
-	span := tracerProvider.Span(ctx, "adapter.api.AddCard")
+	ctx, span := tracerProvider.SpanCtx(ctx, "adapter.api.AddCard")
 	defer span.End()
 	
 	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
@@ -134,8 +134,9 @@ func (h *HttpRouters) GetCard(rw http.ResponseWriter, req *http.Request) error {
 	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
-	span := tracerProvider.Span(ctx, "adapter.api.GetCard")
+	ctx, span := tracerProvider.SpanCtx(ctx, "adapter.api.GetCard")
 	defer span.End()
+
 	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	vars := mux.Vars(req)
@@ -159,8 +160,9 @@ func (h *HttpRouters) UpdateCard(rw http.ResponseWriter, req *http.Request) erro
     ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
-	span := tracerProvider.Span(ctx, "adapter.api.UpdateCard")
+	ctx, span := tracerProvider.SpanCtx(ctx, "adapter.api.UpdateCard")
 	defer span.End()
+
 	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	card := model.Card{}
@@ -185,8 +187,9 @@ func (h *HttpRouters) CreateCardToken(rw http.ResponseWriter, req *http.Request)
 	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
-	span := tracerProvider.Span(ctx, "adapter.api.CreateCardToken")
+	ctx, span := tracerProvider.SpanCtx(ctx, "adapter.api.CreateCardToken")
 	defer span.End()
+
 	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	card := model.Card{}
@@ -211,8 +214,9 @@ func (h *HttpRouters) GetCardToken(rw http.ResponseWriter, req *http.Request) er
 	ctx, cancel := context.WithTimeout(req.Context(), h.ctxTimeout * time.Second)
     defer cancel()
 
-	span := tracerProvider.Span(ctx, "adapter.api.GetCardToken")
+	ctx, span := tracerProvider.SpanCtx(ctx, "adapter.api.GetCardToken")
 	defer span.End()
+	
 	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
 	vars := mux.Vars(req)

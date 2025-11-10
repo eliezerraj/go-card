@@ -95,6 +95,7 @@ func (w WorkerRepository) AddCard(ctx context.Context, tx pgx.Tx, card model.Car
 	var id int
 	
 	if err := row.Scan(&id); err != nil {
+		childLogger.Error().Err(err).Send()			
 		return nil, errors.New(err.Error())
 	}
 
@@ -114,6 +115,7 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 	// prepare database
 	conn, err := w.DatabasePGServer.Acquire(ctx)
 	if err != nil {
+		childLogger.Error().Err(err).Send()	
 		return nil, errors.New(err.Error())
 	}
 	defer w.DatabasePGServer.Release(conn)
@@ -139,6 +141,7 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 	// execute			
 	rows, err := conn.Query(ctx, query, card.CardNumber)
 	if err != nil {
+		childLogger.Error().Err(err).Send()	
 		return nil, errors.New(err.Error())
 	}
 	defer rows.Close()
@@ -162,6 +165,7 @@ func (w WorkerRepository) GetCard(ctx context.Context, card model.Card) (*model.
 							&res_card.TenantID,
 						)
 		if err != nil {
+			childLogger.Error().Err(err).Send()	
 			return nil, errors.New(err.Error())
         }
 		return &res_card, nil
@@ -191,6 +195,7 @@ func (w WorkerRepository) UpdateCard(ctx context.Context, tx pgx.Tx, card model.
 	row, err := tx.Exec(ctx, query, card.CardNumber,  
 									card.UpdatedAt)
 	if err != nil {
+		childLogger.Error().Err(err).Send()			
 		return 0, errors.New(err.Error())
 	}
 
@@ -229,6 +234,7 @@ func (w *WorkerRepository) CreateCardToken(ctx context.Context, tx pgx.Tx, card 
 						card.TenantID)								
 	var id int
 	if err := row.Scan(&id); err != nil {
+		childLogger.Error().Err(err).Send()	
 		return nil, errors.New(err.Error())
 	}
 
@@ -248,6 +254,7 @@ func (w *WorkerRepository) GetCardToken(ctx context.Context, card model.Card) (*
 	// Prepare
 	conn, err := w.DatabasePGServer.Acquire(ctx)
 	if err != nil {
+		childLogger.Error().Err(err).Send()	
 		return nil, errors.New(err.Error())
 	}
 	defer w.DatabasePGServer.Release(conn)
@@ -273,6 +280,7 @@ func (w *WorkerRepository) GetCardToken(ctx context.Context, card model.Card) (*
 
 	rows, err := conn.Query(ctx, query, string(card.TokenData))
 	if err != nil {
+		childLogger.Error().Err(err).Send()	
 		return nil, errors.New(err.Error())
 	}
 	defer rows.Close()
@@ -292,6 +300,7 @@ func (w *WorkerRepository) GetCardToken(ctx context.Context, card model.Card) (*
 							&res_card.UpdatedAt,
 							&res_card.TenantID)
 		if err != nil {
+			childLogger.Error().Err(err).Send()	
 			return nil, errors.New(err.Error())
         }
 		res_card_list = append(res_card_list, res_card)

@@ -75,7 +75,7 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 	childLogger.Info().Str("func","AddCard").Interface("trace-resquest-id", ctx.Value("trace-request-id")).Interface("card", card).Send()
 
 	// trace
-	span := tracerProvider.Span(ctx, "service.AddCard")
+	ctx, span := tracerProvider.SpanCtx(ctx, "service.AddCard")
 	defer span.End()
 	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
 
@@ -144,20 +144,19 @@ func (s *WorkerService) AddCard(ctx context.Context, card model.Card) (*model.Ca
 func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Card, error){
 	childLogger.Info().Str("func","GetCard").Interface("trace-resquest-id", ctx.Value("trace-request-id")).Interface("card", card).Send()
 
-	// trace
-	span := tracerProvider.Span(ctx, "service.GetCard")
-	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
+	// span and trace
+	ctx, span := tracerProvider.SpanCtx(ctx, "service.GetCard")
 	defer span.End()
-	
+
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
+
 	// get card
-	card.Atc = 0
 	res_card, err := s.workerRepository.GetCard(ctx, card)
 	if err != nil {
 		return nil, err
 	}
 
 	// Get the Account ID (PK) from Account-service
-
 	// Set headers
 	headers := map[string]string{
 		"Content-Type":  "application/json;charset=UTF-8",
@@ -174,10 +173,10 @@ func (s *WorkerService) GetCard(ctx context.Context, card model.Card) (*model.Ca
 		Headers: &headers,
 	}
 	// get account_if from id (PK)
-	res_payload, statusCode, err := apiService.CallRestApiV1(	ctx,
-																s.goCoreRestApiService.Client,
-																httpClient, 
-																nil)
+	res_payload, statusCode, err := apiService.CallRestApiV1(ctx,
+															s.goCoreRestApiService.Client,
+															httpClient, 
+															nil)
 	if err != nil {
 		return nil, errorStatusCode(statusCode, s.apiService[0].Name, err)
 	}
@@ -198,7 +197,7 @@ func (s *WorkerService) UpdateCard(ctx context.Context, card model.Card) (*model
 	childLogger.Info().Str("func","UpdateCard").Interface("trace-resquest-id", ctx.Value("trace-request-id")).Interface("card", card).Send()
 
 	// trace
-	span := tracerProvider.Span(ctx, "service.UpdateCard")
+	ctx, span := tracerProvider.SpanCtx(ctx, "service.UpdateCard")
 	defer span.End()
 
 	// prepare database
@@ -249,7 +248,7 @@ func (s * WorkerService) CreateCardToken(ctx context.Context, card model.Card) (
 	childLogger.Info().Str("func","CreateCardToken").Interface("trace-resquest-id", ctx.Value("trace-request-id")).Interface("card", card).Send()
 
 	// Trace
-	span := tracerProvider.Span(ctx, "service.CreateCardToken")
+	ctx, span := tracerProvider.SpanCtx(ctx, "service.CreateCardToken")
 
 	// Get the database connection
 	tx, conn, err := s.workerRepository.DatabasePGServer.StartTx(ctx)
@@ -301,7 +300,7 @@ func (s * WorkerService) GetCardToken(ctx context.Context, card model.Card) (*[]
 	childLogger.Info().Str("func","GetCardToken").Interface("trace-resquest-id", ctx.Value("trace-request-id")).Interface("card", card).Send()
 
 	// Trace
-	span := tracerProvider.Span(ctx, "service.GetCardToken")
+	ctx, span := tracerProvider.SpanCtx(ctx, "service.GetCardToken")
 	defer span.End()
 
 	// Call a service
@@ -311,4 +310,50 @@ func (s * WorkerService) GetCardToken(ctx context.Context, card model.Card) (*[]
 	}
 
 	return res, nil
+}
+
+// About check health service
+func (s * WorkerService) HealthCheck(ctx context.Context) error{
+	childLogger.Info().Str("func","HealthCheck").Interface("trace-resquest-id", ctx.Value("trace-request-id")).Send()
+
+	// Trace
+	ctx, span := tracerProvider.SpanCtx(ctx, "service.HealthCheck")
+	defer span.End()
+	trace_id := fmt.Sprintf("%v",ctx.Value("trace-request-id"))
+
+	// Check database health
+	err := s.workerRepository.DatabasePGServer.Ping()
+	if err != nil {
+		log.Error().Err(err).Msg("*** Database HEALTH FAILED ***")
+		return erro.ErrHealthCheck
+	}
+	childLogger.Info().Str("func","HealthCheck").Msg("*** Database HEALTH SUCCESSFULL ***")
+
+	// Set headers
+	headers := map[string]string{
+		"Content-Type":  "application/json;charset=UTF-8",
+		"X-Request-Id": trace_id,
+		"Host": s.apiService[0].HostName,
+	}
+
+	// Set client http	
+	httpClient := go_core_api.HttpClient {
+		Url: 	s.apiService[0].Url + "/health",
+		Method: s.apiService[0].Method,
+		Timeout: s.apiService[0].HttpTimeout,
+		Headers: &headers,
+	}
+
+	// get account_if from id (PK)
+	_, _, err = apiService.CallRestApiV1(	ctx,
+											s.goCoreRestApiService.Client,
+											httpClient, 
+											nil)
+	if err != nil {
+		log.Error().Err(err).Msg("*** Service ACCOUNT HEALTH FAILED ***")
+		return erro.ErrHealthCheck
+	}
+	childLogger.Info().Str("func","HealthCheck").Msg("*** Service ACCOUNT HEALTH SUCCESSFULL ***")
+	
+	return nil
 }

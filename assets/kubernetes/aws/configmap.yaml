@@ -6,7 +6,8 @@ metadata:
   labels:
     app: *app-name
 data:
-  API_VERSION: "3.3"
+  API_VERSION: "3.6"
+  ACCOUNT_ID: "aws:992382474575"
   POD_NAME: "go-card.eks-arch-02"
   PORT: "6001"
   DB_HOST: "rds-proxy-db-arch-02.proxy-cj4aqa08ettf.us-east-2.rds.amazonaws.com"
