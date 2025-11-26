@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: &app-name go-card-cm
+  namespace: test-a
+  labels:
+    app: *app-name
+data:
+  API_VERSION: "3.6"
+  ACCOUNT_ID: "aws:992382474575"
+  POD_NAME: "go-card.eks-arch-02"
+  PORT: "6001"
+  DB_HOST: "rds-proxy-db-arch-02.proxy-cj4aqa08ettf.us-east-2.rds.amazonaws.com"
+  DB_PORT: "5432"
+  DB_NAME: "postgres"
+  DB_MAX_CONNECTION: "10"
+  CTX_TIMEOUT: "5"
+  SETPOD_AZ: "false"
+  ENV: "dev"
+
+  OTEL_EXPORTER_OTLP_ENDPOINT: "arch-eks-02-xray-collector.default.svc.cluster.local:4317"
+  USE_STDOUT_TRACER_EXPORTER: "false"
+  USE_OTLP_COLLECTOR: "true" 
+  AWS_CLOUDWATCH_LOG_GROUP_NAMES: "/dock/eks/eks-arch-02"
+
+  NAME_SERVICE_00: "go-account"
+  URL_SERVICE_00: "https://nlb-eks-arch-01-02.architecture.caradhras.io" 
+  METHOD_SERVICE_00: "GET"
+  HOST_SERVICE_00: "go-account.architecture.caradhras.io"
+  CLIENT_HTTP_TIMEOUT_00: "10"
+
+  # use with VPC Endpoint 
+  #URL_SERVICE_00: "https://vpce.global.dev.caradhras.io/pv"
+  #X_APIGW_API_ID_SERVICE_00: "129t4y8eoj"
